@@ -15,7 +15,7 @@
 
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
-%define version		295.71
+%define version		304.60
 %define rel		1
 # the highest supported videodrv abi
 %define videodrv_abi	12
@@ -125,7 +125,7 @@
 %endif
 %endif
 
-Summary:	NVIDIA proprietary X.org driver and libraries, long-lived branch driver series
+Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		%{name}
 Version:	%{version}
 Release:	%mkrel %{rel}
@@ -138,19 +138,19 @@ Source3:	ftp://download.nvidia.com/XFree86/nvidia-xconfig/nvidia-xconfig-%{versi
 # Script for building rpms of arbitrary nvidia installers (needs this .spec appended)
 Source4:	nvidia-mdvbuild-skel
 Source100:	nvidia-long-lived.rpmlintrc
-# -Werror=format-string
-Patch0:		nvidia-settings-format-string.patch
 # https://qa.mandriva.com/show_bug.cgi?id=39921
 Patch1:		nvidia-settings-enable-dyntwinview-mdv.patch
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
+Patch4:		nvidia-long-lived-304.32-dkms.conf-unique-module-name.patch
 %endif
 License:	Freeware
 URL:		http://www.nvidia.com/object/unix.html
 Group: 		System/Kernel and hardware
 ExclusiveArch:	%{ix86} x86_64
 %if !%simple
-BuildRequires:	imagemagick libxrender-devel
+BuildRequires:	imagemagick
+BuildRequires:	libxrender-devel
 BuildRequires:	gtk+2-devel
 BuildRequires:	libxv-devel
 %if %mdkversion >= 201200
@@ -165,8 +165,8 @@ BuildRequires:	rpm-build >= 1:5.3.12
 %endif
 
 %description
-Source package of the long-lived branchNVIDIA proprietary driver. Binary
-packages are named x11-driver-video-nvidia-long-livedcurrent on Mandriva Linux
+Source package of the current NVIDIA proprietary driver. Binary
+packages are named x11-driver-video-nvidia-long-lived on Mandriva Linux
 2008 and later, nvidia97xx on Mandriva 2007.1, and nvidia on 2007.0
 and earlier.
 
@@ -287,7 +287,6 @@ HTML version of the README.txt file provided in package
 %else
 %setup -q -c -T -a 2 -a 3
 cd nvidia-settings-%{version}
-%patch0 -p1
 %patch1 -p1
 %patch3 -p1
 cd ..
@@ -296,6 +295,7 @@ sh %{nsource} --extract-only
 
 %if !%simple
 cd %{pkgname}
+%patch4 -p0 -b .uniq~
 cd ..
 %endif
 
@@ -341,6 +341,13 @@ export CXXFLAGS="$CFLAGS"
 export LDFLAGS="%{?ldflags}"
 %endif
 
+%if %mdkversion >= 201200
+# (tpg) simple workaround for https://qa.mandriva.com/show_bug.cgi?id=65616
+# nvidia module can't be linked with ld.gold which for mdv2001200 is default
+# Please remove this if bug will be fixed.
+#sed -i -e 's#LD ?=.*#LD = ld.bfd##' %{pkgname}/kernel/Makefile.*i*
+%endif
+
 %make -C nvidia-settings-%{version}/src/libXNVCtrl
 %make -C nvidia-settings-%{version} STRIP_CMD=true
 %make -C nvidia-xconfig-%{version} STRIP_CMD=true
@@ -354,16 +361,6 @@ cd %{pkgname}
 
 # dkms
 install -d -m755 %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}
-cat > %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}/dkms.conf <<EOF
-PACKAGE_NAME="%{drivername}"
-PACKAGE_VERSION="%{version}-%{release}"
-BUILT_MODULE_NAME[0]="nvidia"
-DEST_MODULE_LOCATION[0]="/kernel/drivers/char/drm"
-DEST_MODULE_NAME[0]="%{modulename}"
-MAKE[0]="make SYSSRC=\${kernel_source_dir} module"
-CLEAN="make -f Makefile.kbuild clean"
-AUTOINSTALL="yes"
-EOF
 
 # menu entry
 install -d -m755 %{buildroot}%{_datadir}/%{drivername}
@@ -630,7 +627,7 @@ cat .manifest | tail -n +9 | while read line; do
 			# not installed
 			continue
 			;;
-		*nvidia-settings*|*nvidia-xconfig*)
+		*nvidia-settings*|*nvidia-xconfig*|*nvidia-cuda*)
 %if !%simple
 			# installed separately below
 			continue
@@ -647,7 +644,7 @@ cat .manifest | tail -n +9 | while read line; do
 		;;
 	UTILITY_BINARY)
 		case "$file" in
-		*nvidia-settings|*nvidia-xconfig)
+		*nvidia-settings|*nvidia-xconfig|*nvidia-cuda*)
 %if !%simple
 			# not installed, we install our own copy
 			continue
@@ -714,7 +711,7 @@ touch %{buildroot}%{_prefix}/lib/vdpau/libvdpau_nvidia.so.1
 
 %if !%simple
 # self-built binaries
-install -m755 ../nvidia-settings-%{version}/_out/*/nvidia-settings %{buildroot}%{nvidia_bindir}
+install -m755 ../nvidia-settings-%{version}/src/_out/*/nvidia-settings %{buildroot}%{nvidia_bindir}
 install -m755 ../nvidia-xconfig-%{version}/_out/*/nvidia-xconfig %{buildroot}%{nvidia_bindir}
 %endif
 # binary alternatives
@@ -737,7 +734,7 @@ touch %{buildroot}%{_libdir}/xorg/modules/extensions/libglx.so
 
 %if !%simple
 # install man pages
-install -m755 ../nvidia-settings-%{version}/_out/*/nvidia-settings.1 %{buildroot}%{_mandir}/man1
+install -m755 ../nvidia-settings-%{version}/doc/_out/*/nvidia-settings.1 %{buildroot}%{_mandir}/man1
 install -m755 ../nvidia-xconfig-%{version}/_out/*/nvidia-xconfig.1 %{buildroot}%{_mandir}/man1
 %endif
 # bug #41638 - whatis entries of nvidia man pages appear wrong
@@ -1134,6 +1131,8 @@ rm -rf %{buildroot}
 %{nvidia_libdir}/libnvidia-compiler.so.%{version}
 %{nvidia_libdir}/libcuda.so.%{version}
 %{nvidia_libdir}/libcuda.so.1
+%{nvidia_libdir}/libnvidia-opencl.so.%{version}
+%{nvidia_libdir}/libnvidia-opencl.so.1
 %ifarch %{biarches}
 %{nvidia_libdir32}/libOpenCL.so.1.0.0
 %{nvidia_libdir32}/libOpenCL.so.1.0
