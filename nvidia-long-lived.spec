@@ -150,15 +150,15 @@ Group: 		System/Kernel and hardware
 ExclusiveArch:	%{ix86} x86_64
 %if !%simple
 BuildRequires:	imagemagick
-BuildRequires:	libxrender-devel
-BuildRequires:	gtk+2-devel
-BuildRequires:	libxv-devel
+BuildRequires:	pkgconfig(xrender)
+BuildRequires:	pkgconfig(gtk+-2.0)
+BuildRequires:	pkgconfig(xv)
 %if %mdkversion >= 201200
-BuildRequires:	GL-devel
+BuildRequires:	pkgconfig(gl)
 %else
 BuildRequires:	mesagl-devel
 %endif
-BuildRequires:	libxxf86vm-devel
+BuildRequires:	pkgconfig(xxf86vm)
 %endif
 %if %mdkversion >= 201100
 BuildRequires:	rpm-build >= 1:5.3.12
