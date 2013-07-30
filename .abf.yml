@@ -1,5 +1,10 @@
-sources:
-  nvidia-xconfig-310.32.tar.bz2: 181226b2a37375d45ad71dceab58e74ddd6def62
+removed_sources:
   nvidia-settings-310.32.tar.bz2: aacc4e990c5773ed52c73587c8991311d30cd367
-  NVIDIA-Linux-x86_64-310.32.run: 3f2b8da482175d86697041eafa7710c8aa4362ed
+  nvidia-xconfig-310.32.tar.bz2: 181226b2a37375d45ad71dceab58e74ddd6def62
+sources:
   NVIDIA-Linux-x86-310.32.run: 89fb7f687ceb294d92439122a0d3bbb9060f5259
+  NVIDIA-Linux-x86-319.32.run: de8f81181d4e24668b7b941bc203c70371856664
+  NVIDIA-Linux-x86_64-310.32.run: 3f2b8da482175d86697041eafa7710c8aa4362ed
+  NVIDIA-Linux-x86_64-319.32.run: 6ec7aa351207eb70509fa03c2707c1c31985559a
+  nvidia-settings-319.32.tar.bz2: 9d5c3438e59b29cb65fee5165478bbb8445164bc
+  nvidia-xconfig-319.32.tar.bz2: c166beed85a326ad5bdac2f8eb4568fa01fb56ca

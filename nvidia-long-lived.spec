@@ -11,12 +11,8 @@
 %{?_without_simple: %global simple 0}
 %{?_with_simple: %global simple 1}
 
-%define name		nvidia-long-lived
-
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
-%define version 319.32
-%define rel		1
 # the highest supported videodrv abi
 %define videodrv_abi	12
 %endif
@@ -100,7 +96,7 @@
 # Other packages should not require any NVIDIA libraries, and this package
 # should not be pulled in when libGL.so.1 is required
 %if %{_use_internal_dependency_generator}
-%define __noautoprov '\\.so'
+%define __noautoprov '\\.so|libGL\\.so\\.1(.*)|devel\\(libGL(.*)'
 %define common_requires_exceptions libGLcore\\.so|libnvidia.*\\.so
 %else
 %define _provides_exceptions \\.so
@@ -126,9 +122,9 @@
 %endif
 
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
-Name:		%{name}
-Version:	%{version}
-Release:	%mkrel %{rel}
+Name:		nvidia-long-lived
+Version:	319.32
+Release:	2
 %if !%simple
 Source0:	ftp://download.nvidia.com/XFree86/Linux-x86/%{version}/%{pkgname32}.run
 Source1:	ftp://download.nvidia.com/XFree86/Linux-x86_64/%{version}/%{pkgname64}.run
@@ -353,8 +349,9 @@ export LDFLAGS="%{?ldflags}"
 #sed -i -e 's#LD ?=.*#LD = ld.bfd##' %{pkgname}/kernel/Makefile.*i*
 %endif
 
-%make -C nvidia-settings-%{version}/src/libXNVCtrl
-%make -C nvidia-settings-%{version} STRIP_CMD=true
+%make -C nvidia-settings-%{version}/src/libXNVCtrl X_CFLAGS="-Wno-error=format-security"
+%make -C nvidia-settings-%{version} STRIP_CMD=true X_CFLAGS="-Wno-error=format-security"
+sed -i -e 's,^common_cflags +=,& -Wno-error=format-security,g' nvidia-xconfig-%{version}/Makefile
 %make -C nvidia-xconfig-%{version} STRIP_CMD=true
 
 # %simple
@@ -646,7 +643,7 @@ cat .manifest | tail -n +9 | while read line; do
 			continue
 %endif
 			;;
-		*nvidia-smi*)
+		*nvidia-smi*|*nvidia-persistenced*)
 			# ok
 			;;
 		*)
@@ -663,7 +660,7 @@ cat .manifest | tail -n +9 | while read line; do
 			continue
 %endif
 			;;
-		*nvidia-smi|*nvidia-bug-report.sh|*nvidia-debugdump)
+		*nvidia-smi|*nvidia-bug-report.sh|*nvidia-debugdump|*nvidia-persistenced)
 			# ok
 			;;
 		*)
@@ -690,6 +687,9 @@ cat .manifest | tail -n +9 | while read line; do
 		;;
 	DOT_DESKTOP)
 		# we provide our own for now
+		;;
+	APPLICATION_PROFILE|NVIDIA_MODPROBE|NVIDIA_MODPROBE_MANPAGE)
+		# whatever
 		;;
 	*)
 		error_unhandled "file $(basename $file) of unknown type $type will be skipped"
@@ -982,6 +982,7 @@ rm -rf %{buildroot}
 %{nvidia_bindir}/nvidia-debugdump
 %{nvidia_bindir}/nvidia-xconfig
 %{nvidia_bindir}/nvidia-bug-report.sh
+%{nvidia_bindir}/nvidia-persistenced
 %endif
 
 %ghost %{_mandir}/man1/nvidia-xconfig.1%{_extension}
@@ -991,6 +992,7 @@ rm -rf %{buildroot}
 %{_mandir}/man1/alt-%{drivername}-xconfig.1*
 %{_mandir}/man1/alt-%{drivername}-settings.1*
 %{_mandir}/man1/alt-%{drivername}-smi.1*
+%{_mandir}/man1/alt-%{drivername}-persistenced.1*
 %else
 %{_mandir}/man1/alt-%{drivername}-*
 %endif
