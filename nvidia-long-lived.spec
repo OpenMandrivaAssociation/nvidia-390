@@ -28,7 +28,7 @@
 %define driverpkgname		x11-driver-video-%{drivername}
 %define modulename		%{drivername}
 # for description and documentation
-%define cards			GeForce 6 and later cards
+%define cards			GeForce 8 and later cards
 %define xorg_extra_modules	%{_libdir}/xorg/extra-modules
 %define nvidia_driversdir	%{_libdir}/%{drivername}/xorg
 %define nvidia_extensionsdir	%{_libdir}/%{drivername}/xorg
