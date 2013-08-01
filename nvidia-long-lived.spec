@@ -160,6 +160,7 @@ BuildRequires:	pkgconfig(xxf86vm)
 %if %mdkversion >= 201100
 BuildRequires:	rpm-build >= 1:5.3.12
 %endif
+BuildRequires:	pkgconfig(vdpau)
 
 %description
 Source package of the current NVIDIA proprietary driver. Binary
