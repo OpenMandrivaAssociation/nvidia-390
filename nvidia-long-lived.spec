@@ -26,7 +26,7 @@
 
 %define drivername		nvidia-long-lived
 %define driverpkgname		x11-driver-video-%{drivername}
-%define modulename		%{drivername}
+%define modulename		nvidia-current
 # for description and documentation
 %define cards			GeForce 8 and later cards
 %define xorg_extra_modules	%{_libdir}/xorg/extra-modules
