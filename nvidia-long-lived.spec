@@ -123,8 +123,8 @@
 
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		nvidia-long-lived
-Version:	319.32
-Release:	2
+Version:	319.49
+Release:	1
 %if !%simple
 Source0:	ftp://download.nvidia.com/XFree86/Linux-x86/%{version}/%{pkgname32}.run
 Source1:	ftp://download.nvidia.com/XFree86/Linux-x86_64/%{version}/%{pkgname64}.run
@@ -138,8 +138,6 @@ Source100:	nvidia-long-lived.rpmlintrc
 Patch1:		nvidia-settings-enable-dyntwinview-mdv.patch
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
-Patch4:		nvidia-long-lived-304.32-dkms.conf-unique-module-name.patch
-Patch5:		nvidia-long-lived-310.32-dont-check-patchlevel-and-sublevel.patch
 %endif
 License:	Freeware
 URL:		http://www.nvidia.com/object/unix.html
@@ -291,17 +289,28 @@ cd ..
 %endif
 sh %{nsource} --extract-only
 
-%if !%simple
-cd %{pkgname}
-%patch4 -p0 -b .uniq~
-cd ..
-%endif
-
-pushd %{pkgname}
-%patch5 -p2 -b .3x~
-popd
 
 rm -rf %{pkgname}/usr/src/nv/precompiled
+
+%if %simple
+# for old releases
+mkdir -p %{pkgname}/kernel
+%endif
+
+# (tmb) nuke nVidia provided dkms.conf as we need our own
+rm -rf %{pkgname}/kernel/dkms.conf
+
+# install our own dkms.conf
+cat > %{pkgname}/kernel/dkms.conf <<EOF
+PACKAGE_NAME="%{drivername}"
+PACKAGE_VERSION="%{version}-%{release}"
+BUILT_MODULE_NAME[0]="nvidia"
+DEST_MODULE_LOCATION[0]="/kernel/drivers/char/drm"
+DEST_MODULE_NAME[0]="%{modulename}"
+MAKE[0]="make SYSSRC=\${kernel_source_dir} module"
+CLEAN="make -f Makefile.kbuild clean"
+AUTOINSTALL="yes"
+EOF
 
 cat > README.install.urpmi <<EOF
 This driver is for %cards.
@@ -606,11 +615,11 @@ cat .manifest | tail -n +9 | while read line; do
 		parseparams subdir
 		install_file_only nvidia-devel %{_includedir}/%{drivername}/$subdir
 		;;
-	ENCODEAPI_LIB)
+	ENCODEAPI_LIB|NVIFR_LIB)
 		parseparams arch subdir
 		install_file nvidia $nvidia_libdir/$subdir
 		;;
-	ENCODEAPI_LIB_SYMLINK)
+	ENCODEAPI_LIB_SYMLINK|NVIFR_LIB_SYMLINK)
 		parseparams arch dest
 		install_lib_symlink nvidia $nvidia_libdir
 		;;
@@ -705,6 +714,11 @@ find %{buildroot}%{_libdir} %{buildroot}%{_prefix}/lib -type d | while read dir;
 	echo "$dir" | grep -q nvidia && echo "%%dir $dir" >> nvidia.files
 done
 [ -d %{buildroot}%{_includedir}/%{drivername} ] && echo "%{_includedir}/%{drivername}" >> nvidia-devel.files
+
+# for old releases in %%simple mode
+if ! [ -e %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}/dkms.conf ]; then
+	install -m644 kernel/dkms.conf %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}/dkms.conf
+fi
 %endif
 
 %if !%simple
@@ -1015,6 +1029,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir}/libGL.so.%{version}
 %{nvidia_libdir}/libnvidia-glcore.so.%{version}
 %{nvidia_libdir}/libnvidia-cfg.so.%{version}
+%{nvidia_libdir}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir}/libnvidia-ml.so.%{version}
 %{nvidia_libdir}/libnvidia-tls.so.%{version}
 %{nvidia_libdir}/vdpau/libvdpau_nvidia.so.%{version}
@@ -1024,6 +1039,7 @@ rm -rf %{buildroot}
 %endif
 %{nvidia_libdir}/libGL.so.1
 %{nvidia_libdir}/libnvidia-cfg.so.1
+%{nvidia_libdir}/libnvidia-ifr.so.1
 %{nvidia_libdir}/libnvidia-ml.so.1
 %{nvidia_libdir}/libvdpau_nvidia.so
 %if %{mdkversion} <= 200810
@@ -1037,6 +1053,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir32}/libGL.so.%{version}
 %{nvidia_libdir32}/libnvidia-glcore.so.%{version}
 %{nvidia_libdir32}/libnvidia-tls.so.%{version}
+%{nvidia_libdir32}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir32}/libvdpau_nvidia.so
 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.%{version}
@@ -1102,6 +1119,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir}/libcuda.so
 %{nvidia_libdir}/libnvcuvid.so
 %{nvidia_libdir}/libnvidia-cfg.so
+%{nvidia_libdir}/libnvidia-ifr.so
 %{nvidia_libdir}/libnvidia-ml.so
 %{nvidia_libdir}/libOpenCL.so
 %{nvidia_libdir}/libnvidia-encode.so
@@ -1112,6 +1130,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir32}/libGL.so
 %{nvidia_libdir32}/libcuda.so
 %{nvidia_libdir32}/libOpenCL.so
+%{nvidia_libdir32}/libnvidia-ifr.so
 %{nvidia_libdir32}/libnvidia-ml.so
 %{nvidia_libdir32}/libnvcuvid.so
 %{nvidia_libdir32}/libnvidia-encode.so
@@ -1153,6 +1172,8 @@ rm -rf %{buildroot}
 %{nvidia_libdir32}/libnvidia-opencl.so.1
 %{nvidia_libdir32}/libnvidia-encode.so.%{version}
 %{nvidia_libdir32}/libnvidia-encode.so.1
+%{nvidia_libdir32}/libnvidia-ifr.so.%{version}
+%{nvidia_libdir32}/libnvidia-ifr.so.1
 %{nvidia_libdir32}/libnvcuvid.so.%{version}
 %{nvidia_libdir32}/libnvcuvid.so.1
 %{nvidia_libdir32}/libcuda.so.%{version}
