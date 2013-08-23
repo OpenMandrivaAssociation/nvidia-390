@@ -615,11 +615,11 @@ cat .manifest | tail -n +9 | while read line; do
 		parseparams subdir
 		install_file_only nvidia-devel %{_includedir}/%{drivername}/$subdir
 		;;
-	ENCODEAPI_LIB)
+	ENCODEAPI_LIB|NVIFR_LIB)
 		parseparams arch subdir
 		install_file nvidia $nvidia_libdir/$subdir
 		;;
-	ENCODEAPI_LIB_SYMLINK)
+	ENCODEAPI_LIB_SYMLINK|NVIFR_LIB_SYMLINK)
 		parseparams arch dest
 		install_lib_symlink nvidia $nvidia_libdir
 		;;
@@ -1029,6 +1029,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir}/libGL.so.%{version}
 %{nvidia_libdir}/libnvidia-glcore.so.%{version}
 %{nvidia_libdir}/libnvidia-cfg.so.%{version}
+%{nvidia_libdir}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir}/libnvidia-ml.so.%{version}
 %{nvidia_libdir}/libnvidia-tls.so.%{version}
 %{nvidia_libdir}/vdpau/libvdpau_nvidia.so.%{version}
@@ -1038,6 +1039,7 @@ rm -rf %{buildroot}
 %endif
 %{nvidia_libdir}/libGL.so.1
 %{nvidia_libdir}/libnvidia-cfg.so.1
+%{nvidia_libdir}/libnvidia-ifr.so.1
 %{nvidia_libdir}/libnvidia-ml.so.1
 %{nvidia_libdir}/libvdpau_nvidia.so
 %if %{mdkversion} <= 200810
@@ -1051,6 +1053,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir32}/libGL.so.%{version}
 %{nvidia_libdir32}/libnvidia-glcore.so.%{version}
 %{nvidia_libdir32}/libnvidia-tls.so.%{version}
+%{nvidia_libdir32}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir32}/libvdpau_nvidia.so
 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.%{version}
@@ -1116,6 +1119,7 @@ rm -rf %{buildroot}
 %{nvidia_libdir}/libcuda.so
 %{nvidia_libdir}/libnvcuvid.so
 %{nvidia_libdir}/libnvidia-cfg.so
+%{nvidia_libdir}/libnvidia-ifr.so
 %{nvidia_libdir}/libnvidia-ml.so
 %{nvidia_libdir}/libOpenCL.so
 %{nvidia_libdir}/libnvidia-encode.so
@@ -1167,6 +1171,8 @@ rm -rf %{buildroot}
 %{nvidia_libdir32}/libnvidia-opencl.so.1
 %{nvidia_libdir32}/libnvidia-encode.so.%{version}
 %{nvidia_libdir32}/libnvidia-encode.so.1
+%{nvidia_libdir32}/libnvidia-ifr.so.%{version}
+%{nvidia_libdir32}/libnvidia-ifr.so.1
 %{nvidia_libdir32}/libnvcuvid.so.%{version}
 %{nvidia_libdir32}/libnvcuvid.so.1
 %{nvidia_libdir32}/libcuda.so.%{version}
