@@ -292,6 +292,11 @@ sh %{nsource} --extract-only
 
 rm -rf %{pkgname}/usr/src/nv/precompiled
 
+%if %simple
+# for old releases
+mkdir -p %{pkgname}/kernel
+%endif
+
 # (tmb) nuke nVidia provided dkms.conf as we need our own
 rm -rf %{pkgname}/kernel/dkms.conf
 
