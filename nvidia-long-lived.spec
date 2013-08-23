@@ -123,8 +123,8 @@
 
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		nvidia-long-lived
-Version:	319.32
-Release:	2
+Version:	319.49
+Release:	1
 %if !%simple
 Source0:	ftp://download.nvidia.com/XFree86/Linux-x86/%{version}/%{pkgname32}.run
 Source1:	ftp://download.nvidia.com/XFree86/Linux-x86_64/%{version}/%{pkgname64}.run
