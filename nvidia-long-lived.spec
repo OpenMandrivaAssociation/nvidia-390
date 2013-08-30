@@ -97,7 +97,7 @@
 # should not be pulled in when libGL.so.1 is required
 %if %{_use_internal_dependency_generator}
 %define __noautoprov '\\.so|libGL\\.so\\.1(.*)|devel\\(libGL(.*)'
-%define common_requires_exceptions libGLcore\\.so|libnvidia.*\\.so
+%define common_requires_exceptions libGL\\.so\\|libGLcore\\.so\\|libnvidia.*\\.so
 %else
 %define _provides_exceptions \\.so
 %define common_requires_exceptions libGLcore\\.so\\|libnvidia.*\\.so
@@ -124,7 +124,7 @@
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		nvidia-long-lived
 Version:	319.49
-Release:	1
+Release:	2
 %if !%simple
 Source0:	ftp://download.nvidia.com/XFree86/Linux-x86/%{version}/%{pkgname32}.run
 Source1:	ftp://download.nvidia.com/XFree86/Linux-x86_64/%{version}/%{pkgname64}.run
