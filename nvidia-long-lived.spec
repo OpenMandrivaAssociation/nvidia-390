@@ -111,7 +111,7 @@
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		nvidia-long-lived
 Version:	319.60
-Release:	1
+Release:	2
 %if !%simple
 Source0:	ftp://download.nvidia.com/XFree86/Linux-x86/%{version}/%{pkgname32}.run
 Source1:	ftp://download.nvidia.com/XFree86/Linux-x86_64/%{version}/%{pkgname64}.run
@@ -836,7 +836,7 @@ install -d -m755 %{buildroot}%{_datadir}/ldetect-lst/pcitable.d
 gzip -c pcitable.nvidia.lst > %{buildroot}%{_datadir}/ldetect-lst/pcitable.d/40%{drivername}.lst.gz
 %endif
 
-export EXCLUDE_FROM_STRIP="$(find %{buildroot} -type f \! -name nvidia-settings \! -name nvidia-xconfig)"
+export EXCLUDE_FROM_STRIP="$(find %{buildroot} -type f \! -name nvidia-settings \! -name nvidia-xconfig \! -name nvidia-modprobe \! -name nvidia-persistenced)"
 
 %post -n %{driverpkgname}
 # XFdrake used to generate an nvidia.conf file
