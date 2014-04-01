@@ -130,15 +130,9 @@ Source4:	nvidia-mdvbuild-skel
 Source5:	ftp://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-%{version}.tar.bz2
 Source6:	ftp://download.nvidia.com/XFree86/nvidia-persistenced/nvidia-persistenced-%{version}.tar.bz2
 Source100:	nvidia-long-lived.rpmlintrc
-# https://qa.mandriva.com/show_bug.cgi?id=39921
-Patch1:		nvidia-settings-enable-dyntwinview-mdv.patch
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
-#Patch4:		nvidia-current-331.38-CONFIG_UIDGID_STRICT_TYPE_CHECKS-buildfix.patch
-#Patch5:		nvidia-current-313.18-dont-check-patchlevel-and-sublevel.patch
-Patch6:		nvidia-settings-319.12-fix-format_not_string.patch
-Patch7:		nvidia-xconfig-319.12-fix-format_not_string.patch
-Patch8:		nvidia-persistenced-319.17-add-missing-libtirpc-link.patch
+Patch8:                nvidia-persistenced-319.17-add-missing-libtirpc-link.patch
 %endif
 License:	Freeware
 URL:		http://www.nvidia.com/object/unix.html
@@ -305,12 +299,9 @@ HTML version of the README.txt file provided in package
 %else
 %setup -q -c -T -a 2 -a 3 -a 5 -a 6
 cd nvidia-settings-%{version}
-##%patch1 -p1
 %patch3 -p1
-#patch6 -p1
 cd ..
 cd nvidia-xconfig-%{version}
-#patch7 -p1
 cd ..
 cd nvidia-persistenced-%{version}
 %patch8 -p1
@@ -321,7 +312,6 @@ sh %{nsource} --extract-only
 
 %if !%simple
 cd %{pkgname}
-#patch4 -p2
 cd ..
 %endif
 
@@ -571,6 +561,10 @@ cat .manifest | tail -n +9 | while read line; do
 	CUDA_SYMLINK)
 		parseparams arch subdir dest
 		install_lib_symlink nvidia-cuda $nvidia_libdir/$subdir
+		;;
+	EXPLICIT_PATH)
+		parseparams dest
+		install_file nvidia %{_datadir}/nvidia
 		;;
 	NVCUVID_LIB)
 		parseparams arch subdir
@@ -1071,6 +1065,8 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{_sysconfdir}/%{drivername}/nvidia.icd
 %dir %{_datadir}/nvidia
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-rc
+%{_datadir}/nvidia/monitoring.conf
+%{_datadir}/nvidia/pci.ids
 %endif
 
 %dir %{_sysconfdir}/OpenCL
