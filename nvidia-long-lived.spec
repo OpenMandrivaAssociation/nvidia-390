@@ -129,12 +129,12 @@ Source3:	ftp://download.nvidia.com/XFree86/nvidia-xconfig/nvidia-xconfig-%{versi
 Source4:	nvidia-mdvbuild-skel
 Source5:	ftp://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-%{version}.tar.bz2
 Source6:	ftp://download.nvidia.com/XFree86/nvidia-persistenced/nvidia-persistenced-%{version}.tar.bz2
-Source100:	nvidia-current.rpmlintrc
+Source100:	nvidia-long-lived.rpmlintrc
 # https://qa.mandriva.com/show_bug.cgi?id=39921
 Patch1:		nvidia-settings-enable-dyntwinview-mdv.patch
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
-Patch4:		nvidia-current-331.38-CONFIG_UIDGID_STRICT_TYPE_CHECKS-buildfix.patch
+#Patch4:		nvidia-current-331.38-CONFIG_UIDGID_STRICT_TYPE_CHECKS-buildfix.patch
 #Patch5:		nvidia-current-313.18-dont-check-patchlevel-and-sublevel.patch
 Patch6:		nvidia-settings-319.12-fix-format_not_string.patch
 Patch7:		nvidia-xconfig-319.12-fix-format_not_string.patch
@@ -321,7 +321,7 @@ sh %{nsource} --extract-only
 
 %if !%simple
 cd %{pkgname}
-%patch4 -p2
+#patch4 -p2
 cd ..
 %endif
 
