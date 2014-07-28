@@ -374,7 +374,7 @@ installation in the file 'README.install.urpmi' in this directory.
 EOF
 
 %if !%simple
-rm nvidia-settings-%{version}/src/*/*.a
+rm nvidia-settings-%{version}/src/*/*.a ||:
 
 %build
 %if %mdkversion >= 201000
