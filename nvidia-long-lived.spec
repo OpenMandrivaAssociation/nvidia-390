@@ -1075,6 +1075,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{_sysconfdir}/%{drivername}/nvidia.icd
 %dir %{_datadir}/nvidia
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-rc
+%{_datadir}/nvidia/nvidia-application-profiles-%{version}-key-documentation
 %{_datadir}/nvidia/monitoring.conf
 %{_datadir}/nvidia/pci.ids
 %endif
