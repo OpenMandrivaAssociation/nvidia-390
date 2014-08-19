@@ -1138,7 +1138,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %dir %{nvidia_libdir}/tls
 %dir %{nvidia_libdir}/vdpau
 %{nvidia_libdir}/libGL.so.%{version}
-%ifnarch %{biarches}
+%ifarch %{biarches}
 %{nvidia_libdir}/libEGL.so.%{version}
 %{nvidia_libdir}/libGLESv*.%{version}
 %{nvidia_libdir}/libnvidia-eglcore.so.%{version}
@@ -1221,6 +1221,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libGL.so.%{version}
 %{nvidia_libdir32}/libEGL.so.%{version}
 %{nvidia_libdir32}/libGLESv*.%{version}
+%{nvidia_libdir32}/libnvidia-fbc.so.%{version}
 %{nvidia_libdir32}/libnvidia-glcore.so.%{version}
 %{nvidia_libdir32}/libnvidia-eglcore.so.%{version}
 %{nvidia_libdir32}/libnvidia-glsi.so.%{version}
@@ -1239,6 +1240,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libEGL.so.1
 %{nvidia_libdir32}/libGLESv*.so.1
 %{nvidia_libdir32}/libGLESv*.so.2
+%{nvidia_libdir32}/libnvidia-fbc.so.1
 %if %{mdkversion} <= 200810
 %{nvidia_libdir32}/libvdpau.so.1
 %endif
@@ -1271,6 +1273,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libGLESv*.so
 %{nvidia_libdir32}/libcuda.so
 %{nvidia_libdir32}/libOpenCL.so
+%{nvidia_libdir32}/libnvidia-fbc.so
 %{nvidia_libdir32}/libnvidia-ml.so
 %{nvidia_libdir32}/libnvidia-ifr.so
 %{nvidia_libdir32}/libnvcuvid.so
