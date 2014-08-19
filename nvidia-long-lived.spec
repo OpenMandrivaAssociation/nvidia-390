@@ -1156,7 +1156,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir}/libvdpau.so.%{version}
 %endif
 %{nvidia_libdir}/libGL.so.1
-%ifnarch %{biarches}
+%ifarch %{biarches}
 %{nvidia_libdir}/libEGL.so.1
 %{nvidia_libdir}/libGLESv*.so.1
 %{nvidia_libdir}/libGLESv*.so.2
