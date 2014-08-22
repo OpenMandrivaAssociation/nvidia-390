@@ -1075,6 +1075,9 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{_sysconfdir}/%{drivername}/nvidia.icd
 %dir %{_datadir}/nvidia
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-rc
+%{_datadir}/nvidia/nvidia-application-profiles-%{version}-key-documentation
+%{_datadir}/nvidia/monitoring.conf
+%{_datadir}/nvidia/pci.ids
 %endif
 
 %dir %{_sysconfdir}/OpenCL
@@ -1123,7 +1126,6 @@ rmmod nvidia > /dev/null 2>&1 || true
 %ghost %{_datadir}/applications/%{disttag}-nvidia-settings.desktop
 %dir %{_datadir}/%{drivername}
 %{_datadir}/%{drivername}/%{disttag}-nvidia-settings.desktop
-%{_datadir}/nvidia/nvidia-application-profiles-*-key-documentation
 
 %if !%simple
 %{_iconsdir}/hicolor/16x16/apps/%{drivername}-settings.png
@@ -1220,6 +1222,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libnvidia-eglcore.so.%{version}
 %{nvidia_libdir32}/libnvidia-glsi.so.%{version}
 %{nvidia_libdir32}/libnvidia-tls.so.%{version}
+%{nvidia_libdir32}/libnvidia-fbc.so.%{version}
 %{nvidia_libdir32}/libvdpau_nvidia.so
 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.%{version}
