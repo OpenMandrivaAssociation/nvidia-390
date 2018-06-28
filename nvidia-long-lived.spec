@@ -29,11 +29,11 @@
 
 # For now, backportability is kept for 2008.0 forwards.
 
-%define drivername		nvidia-long-lived
+%define drivername nvidia-long-lived
 %define driverpkgname x11-driver-video-%{drivername}
 %define modulename %{drivername}
 # for description and documentation
-%define cards			GeForce 8xxx and later cards
+%define cards GeForce 8xxx and later cards
 %define xorg_extra_modules %{_libdir}/xorg/extra-modules
 %define nvidia_driversdir %{_libdir}/%{drivername}/xorg
 %define nvidia_extensionsdir %{_libdir}/%{drivername}/xorg
@@ -52,9 +52,8 @@
 # our entries)
 %if %simple
 # nvidia/vesa
-%define ldetect_cards_name	NVIDIA GeForce 7050
+%define ldetect_cards_name NVIDIA GeForce 7050
 %endif
-
 
 %define biarches x86_64
 
@@ -335,6 +334,7 @@ EOF
 rm nvidia-settings-%{version}/src/*/*.a ||:
 
 %build
+#export CC=gcc CXX=g++
 %setup_compile_flags
 
 # (tpg) needed for patch 6
@@ -349,10 +349,10 @@ popd
 export CFLAGS="%{optflags} -Wno-error=format-security"
 
 %make -C nvidia-settings-%{version}/src/libXNVCtrl
-%make -C nvidia-settings-%{version} STRIP_CMD=true
-%make -C nvidia-xconfig-%{version} STRIP_CMD=true
-%make -C nvidia-modprobe-%{version} STRIP_CMD=true
-%make -C nvidia-persistenced-%{version} STRIP_CMD=true
+%make -C nvidia-settings-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
+%make -C nvidia-xconfig-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
+%make -C nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
+%make -C nvidia-persistenced-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
 
 # %simple
 %endif
@@ -496,9 +496,11 @@ for file in nvidia.files nvidia-devel.files nvidia-cuda.files nvidia-dkms.files 
 	rm -f $file
 	touch $file
 done
+
 # install files according to .manifest
 #set +x
 cat .manifest | sed 's/INHERIT_PATH_DEPTH:[0-9]//;s/MODULE:.*//'| tail -n +9 |  while read line; do
+
 	arch=
 	style=
 	subdir=
@@ -511,7 +513,7 @@ cat .manifest | sed 's/INHERIT_PATH_DEPTH:[0-9]//;s/MODULE:.*//'| tail -n +9 |  
 	perms=${rest%%%% *}
 	rest=${rest#* }
 	type=${rest%%%% *}
-	 [ "${rest#* }" = "$rest" ] && rest= || rest=${rest#* }
+	[ "${rest#* }" = "$rest" ] && rest= || rest=${rest#* }
 
 	case "$type" in
 	CUDA_LIB)
