@@ -52,7 +52,7 @@
 # our entries)
 %if %simple
 # nvidia/vesa
-%define ldetect_cards_name NVIDIA GeForce 7050
+%define ldetect_cards_name NVIDIA GeForce 420 series and later
 %endif
 
 %define biarches x86_64
