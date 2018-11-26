@@ -16,7 +16,7 @@
 
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
-%define version 390.77
+%define version 390.87
 %define rel 1
 # the highest supported videodrv abi
 %define videodrv_abi 23
@@ -104,6 +104,8 @@ Source100:	nvidia-long-lived.rpmlintrc
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
 Patch8:		nvidia-persistenced-319.17-add-missing-libtirpc-link.patch
+Patch9:		kernel-4.16.patch
+Patch10:	kernel-4.19.patch
 %endif
 License:	Freeware
 URL:		http://www.nvidia.com/object/unix.html
@@ -270,6 +272,8 @@ cd %{pkgname}
 # extra patches here
 %endif
 # extra patches here
+%patch9 -p1
+%patch10 -p1
 cd ..
 %endif
 
