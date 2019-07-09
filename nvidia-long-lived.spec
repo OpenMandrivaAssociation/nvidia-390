@@ -13,10 +13,11 @@
 %{?_with_simple: %global simple 1}
 
 %define name	nvidia-long-lived
+%define kname nvidia
 
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
-%define version 390.77
+%define version 415.27
 %define rel 1
 # the highest supported videodrv abi
 %define videodrv_abi 23
@@ -190,7 +191,7 @@ Conflicts:	%{drivername}-cuda-opencl <= 325.15-1
 Summary:	NVIDIA kernel module for %cards
 Group:		System/Kernel and hardware
 Requires:	dkms >= 2.2.0.3.1-3.20130827.8
-Requires(post):	dkms >= 2.2.0.3.1-3.20130827.8
+Requires(post):	dkms  >= 2.2.0.3.1-3.20130827.8
 Requires(preun): dkms >= 2.2.0.3.1-3.20130827.8
 Obsoletes:	dkms-nvidia < 1:%{version}-%{release}
 Provides:	dkms-nvidia = 1:%{version}-%{release}
@@ -285,20 +286,23 @@ rm -f %{pkgname}/kernel/dkms.conf
 
 # install our own dkms.conf
 cat > %{pkgname}/kernel/dkms.conf <<EOF
+MAKE[0]="'./nvllbuild' \${kernel_source_dir}"
 PACKAGE_NAME="%{drivername}"
 PACKAGE_VERSION="%{version}-%{release}"
 BUILT_MODULE_NAME[0]="nvidia"
 DEST_MODULE_LOCATION[0]="/kernel/drivers/char/drm"
-DEST_MODULE_NAME[0]="%{modulename}"
+DEST_MODULE_NAME[0]="nvidia"
 BUILT_MODULE_NAME[1]="nvidia-modeset"
 DEST_MODULE_LOCATION[1]="/kernel/drivers/char/drm"
+DEST_MODULE_NAME[1]="nvidia-modeset"
 %ifarch x86_64
 BUILT_MODULE_NAME[2]="nvidia-uvm"
 DEST_MODULE_LOCATION[2]="/kernel/drivers/char/drm"
+DEST_MODULE_NAME[2]="nvidia-uvm"
 %endif
 BUILT_MODULE_NAME[3]="nvidia-drm"
 DEST_MODULE_LOCATION[3]="/kernel/drivers/char/drm"
-MAKE[0]="'make' CC=gcc CXX=g++ SYSSRC=\${kernel_source_dir} modules"
+DEST_MODULE_NAME[3]="nvidia-drm"
 AUTOINSTALL="yes"
 EOF
 
@@ -362,7 +366,17 @@ cd %{pkgname}
 
 # dkms
 install -d -m755 %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}
+cat > nvllbuild << EOF
+#!/bin/sh
+set -e
+export "CC=gcc" LDFLAGS="$LDFLAGS --build-id=none"
+ln -s Module.symvers nvidia-drm/Module.symvers 
+ln -s Module.symvers nvidia-modeset/Module.symvers 
+ln -s Module.symvers nvidia-uvm/Module.symvers 
+make  KERN_DIR=\$1 modules
 
+EOF
+install -m 0755 nvllbuild %{buildroot}%{_usr}/src/%{name}-%{version}-%{release}
 # menu entry
 install -d -m755 %{buildroot}%{_datadir}/%{drivername}
 cat > %{buildroot}%{_datadir}/%{drivername}/%{disttag}-nvidia-settings.desktop <<EOF
@@ -1093,7 +1107,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 
 %if !%simple
 %dir %{nvidia_libdir}
-%dir %{nvidia_libdir}/tls
+#%dir %{nvidia_libdir}/tls
 %dir %{nvidia_libdir}/vdpau
 %{nvidia_libdir}/libGL.so.%{version}
 %{nvidia_libdir}/libnvidia-eglcore.so.%{version}
@@ -1108,7 +1122,14 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir}/libnvidia-ml.so.%{version}
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so.%{version}
-%{nvidia_libdir}/libnvidia-tls.so.%{version}
+%{nvidia_libdir}/libnvidia-glvkspirv.so.%{version}
+%{nvidia_libdir}/libnvidia-cbl.so.%{version}
+%{nvidia_libdir}/libnvidia-glvkspirv.so.%{version}
+%{nvidia_libdir}/libnvidia-rtcore.so.%{version}
+%{nvidia_libdir}/libnvoptix.so.1
+%{nvidia_libdir}/libnvoptix.so.%{version}
+%{nvidia_libdir}/xorg/libglxserver_nvidia.so
+%{nvidia_libdir}/xorg/libglxserver_nvidia.so.%{version}
 %{nvidia_libdir}/vdpau/libvdpau_nvidia.so.%{version}
 %{nvidia_libdir}/libGL.so.1
 %{nvidia_libdir}/libGLdispatch.so.0
@@ -1128,7 +1149,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir}/libnvidia-ifr.so.1
 %{nvidia_libdir}/libnvidia-ml.so.1
 %{nvidia_libdir}/libvdpau_nvidia.so
-%{nvidia_libdir}/tls/libnvidia-tls.so.%{version}
+%{nvidia_libdir}/libnvidia-tls.so.%{version}
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so.1
 # %simple
@@ -1151,10 +1172,10 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_modulesdir}/libnvidia-wfb.so.%{version}
 %endif
 
-%if !%simple
-%{nvidia_extensionsdir}/libglx.so.%{version}
-%{nvidia_extensionsdir}/libglx.so
-%endif
+#%%if !%%simple
+#%%{nvidia_extensionsdir}/libglx.so.%%{version}
+#%%{nvidia_extensionsdir}/libglx.so
+#%%endif
 
 %if !%simple
 %{nvidia_driversdir}/nvidia_drv.so
@@ -1163,7 +1184,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %ifarch %{biarches}
 %files -n %{driverpkgname}-32bit
 %dir %{nvidia_libdir32}
-%dir %{nvidia_libdir32}/tls
+#%dir %{nvidia_libdir32}/tls
 %dir %{nvidia_libdir32}/vdpau
 %{nvidia_libdir32}/libGL.so.%{version}
 %{nvidia_libdir32}/libEGL_nvidia.so.0
@@ -1176,6 +1197,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so.%{version}
 %{nvidia_libdir32}/libvdpau_nvidia.so
 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version}
+%{nvidia_libdir32}/libnvidia-glvkspirv.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.1
 %{nvidia_libdir32}/libnvidia-ifr.so.%{version}
@@ -1193,15 +1215,16 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libGLX_nvidia.so.0
 %{nvidia_libdir32}/libGLX_nvidia.so.%{version}
 %{nvidia_libdir32}/libOpenGL.so.0
-%{nvidia_libdir32}/tls/libnvidia-tls.so.%{version}
+#%%{nvidia_libdir32}/tls/libnvidia-tls.so.%%{version}
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so.1
 %endif
 
-%files -n %{drivername}-devel -f %pkgname/nvidia-devel.files
+#%files -n %{drivername}-devel -f %pkgname/nvidia-devel.files
+%files -n %{drivername}-devel
 %defattr(-,root,root)
 %if !%simple
-%{_includedir}/%{drivername}
+#%{_includedir}/%{drivername}
 %{nvidia_libdir}/libGL.so
 %{nvidia_libdir}/libEGL.so
 %{nvidia_libdir}/libGLESv*.so
@@ -1237,7 +1260,8 @@ rmmod nvidia > /dev/null 2>&1 || true
 %files -n %{drivername}-doc-html -f %pkgname/nvidia-html.files
 %defattr(-,root,root)
 
-%files -n %{drivername}-cuda-opencl -f %pkgname/nvidia-cuda.files
+#%files -n %{drivername}-cuda-opencl -f %pkgname/nvidia-cuda.files
+%files -n %{drivername}-cuda-opencl
 %defattr(-,root,root)
 %if !%simple
 %{nvidia_libdir}/libOpenCL.so.1.0.0

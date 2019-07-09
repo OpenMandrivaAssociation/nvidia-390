@@ -1,1 +1,5 @@
 sources:
+  nvidia-modprobe-415.27.tar.bz2: 18ac94fb7194755de3e73a6996e8c6e1c99528ef
+  nvidia-persistenced-415.27.tar.bz2: 8ff29033e0d9a438cf40f4c4907d3134787671a8
+  nvidia-settings-415.27.tar.bz2: aa3f51a2699703d22b45181f686a754a1a276a9d
+  nvidia-xconfig-415.27.tar.bz2: 37f3ceaf4a778a0d4516d35b29427928bb0897f4
