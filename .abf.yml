@@ -1,5 +1,7 @@
 sources:
-  nvidia-modprobe-415.27.tar.bz2: 18ac94fb7194755de3e73a6996e8c6e1c99528ef
-  nvidia-persistenced-415.27.tar.bz2: 8ff29033e0d9a438cf40f4c4907d3134787671a8
-  nvidia-settings-415.27.tar.bz2: aa3f51a2699703d22b45181f686a754a1a276a9d
-  nvidia-xconfig-415.27.tar.bz2: 37f3ceaf4a778a0d4516d35b29427928bb0897f4
+  nvidia-modprobe-390.132.tar.bz2: 802727e5eeb6b09a7a053b1054ee0e9f203db0d2
+  nvidia-persistenced-390.132.tar.bz2: d9aeabc0ce05049e796eb82c57bb32f8bd378cae
+  nvidia-settings-390.132.tar.bz2:  0b782b517911bb3919cff74a93b51e001586b0ed
+  nvidia-xconfig-390.132.tar.bz2: e50cd28298fae541ab23f40eda5ea523d00e9769
+  NVIDIA-Linux-x86_64-390.132.run: 63d49c0fac620b21a23b361a9f02487534ac9c5c
+  NVIDIA-Linux-x86-390.132.run: 1966a1d54c3ab415a7b252f4a0d38fa77a7e4c30

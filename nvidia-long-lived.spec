@@ -17,7 +17,7 @@
 
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
-%define version 415.27
+%define version 390.132
 %define rel 1
 # the highest supported videodrv abi
 %define videodrv_abi 23
@@ -71,7 +71,7 @@
 
 # Other packages should not require any NVIDIA libraries, and this package
 # should not be pulled in when libGL.so.1 is required
-%define __noautoprov 'libGL\\.so\\.1(.*)|devel\\(libGL(.*)|\\.so'
+%global __provides_exclude 'libGL\\.so\\.1(.*)|devel\\(libGL(.*)|\\.so'
 %define common_requires_exceptions ^libGL\\.so\\|^libGLcore\\.so\\|^libGLdispatch\\.so|^libnvidia.*\\.so
 
 %ifarch %{biarches}
@@ -79,13 +79,13 @@
 # of 32-bit libraries are not satisfied. If a 32-bit package that requires
 # libGL.so.1 is installed, the 32-bit mesa libs are pulled in and that will
 # pull the dependencies of 32-bit nvidia libraries in as well.
-%define __noautoreq %common_requires_exceptions\\|^lib.*so\\.[^(]\\+\\(([^)]\\+)\\)\\?$
+%global __requires_exclude %common_requires_exceptions\\|^lib.*so\\.[^(]\\+\\(([^)]\\+)\\)\\?$
 %else
-%define __noautoreq %common_requires_exceptions
+%global __requires_exclude %common_requires_exceptions
 %endif
 
 # https://devtalk.nvidia.com/default/topic/523762/libnvidia-encode-so-310-19-has-dependency-on-missing-library/
-%define __noautoreqfiles libnvidia-encode.so.%{version}
+%define __requires_exclude_from libnvidia-encode.so.%{version}
 
 Summary:	NVIDIA proprietary X.org driver and libraries, current driver series
 Name:		%{name}
@@ -286,7 +286,6 @@ rm -f %{pkgname}/kernel/dkms.conf
 
 # install our own dkms.conf
 cat > %{pkgname}/kernel/dkms.conf <<EOF
-MAKE[0]="'./nvllbuild' \${kernel_source_dir}"
 PACKAGE_NAME="%{drivername}"
 PACKAGE_VERSION="%{version}-%{release}"
 BUILT_MODULE_NAME[0]="nvidia"
@@ -303,6 +302,7 @@ DEST_MODULE_NAME[2]="nvidia-uvm"
 BUILT_MODULE_NAME[3]="nvidia-drm"
 DEST_MODULE_LOCATION[3]="/kernel/drivers/char/drm"
 DEST_MODULE_NAME[3]="nvidia-drm"
+MAKE[0]="'make' CC=gcc CXX=g++ SYSSRC=\${kernel_source_dir} modules"
 AUTOINSTALL="yes"
 EOF
 
@@ -338,7 +338,8 @@ EOF
 rm nvidia-settings-%{version}/src/*/*.a ||:
 
 %build
-#export CC=gcc CXX=g++
+export CC=gcc  CXX=g++
+export LD=ld.bfd 
 %setup_compile_flags
 
 # (tpg) needed for patch 6
@@ -352,11 +353,11 @@ popd
 # (tpg) need to provide a patch to fix format error
 export CFLAGS="%{optflags} -Wno-error=format-security"
 
-%make -C nvidia-settings-%{version}/src/libXNVCtrl
-%make -C nvidia-settings-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
-%make -C nvidia-xconfig-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
-%make -C nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
-%make -C nvidia-persistenced-%{version} NV_KEEP_UNSTRIPPED_BINARIES=true
+%make -C nvidia-settings-%{version}/src/libXNVCtrl CC=gcc
+%make -C nvidia-settings-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false CC=gcc
+%make -C nvidia-xconfig-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+%make -C nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+%make -C nvidia-persistenced-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
 
 # %simple
 %endif
@@ -1107,8 +1108,9 @@ rmmod nvidia > /dev/null 2>&1 || true
 
 %if !%simple
 %dir %{nvidia_libdir}
-#%dir %{nvidia_libdir}/tls
+%dir %{nvidia_libdir}/tls
 %dir %{nvidia_libdir}/vdpau
+%{nvidia_libdir}/tls/libnvidia-tls.so.%{version}
 %{nvidia_libdir}/libGL.so.%{version}
 %{nvidia_libdir}/libnvidia-eglcore.so.%{version}
 %{nvidia_libdir}/libnvidia-egl-wayland.so.*
@@ -1122,14 +1124,6 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir}/libnvidia-ifr.so.%{version}
 %{nvidia_libdir}/libnvidia-ml.so.%{version}
 %{nvidia_libdir}/libnvidia-ptxjitcompiler.so.%{version}
-%{nvidia_libdir}/libnvidia-glvkspirv.so.%{version}
-%{nvidia_libdir}/libnvidia-cbl.so.%{version}
-%{nvidia_libdir}/libnvidia-glvkspirv.so.%{version}
-%{nvidia_libdir}/libnvidia-rtcore.so.%{version}
-%{nvidia_libdir}/libnvoptix.so.1
-%{nvidia_libdir}/libnvoptix.so.%{version}
-%{nvidia_libdir}/xorg/libglxserver_nvidia.so
-%{nvidia_libdir}/xorg/libglxserver_nvidia.so.%{version}
 %{nvidia_libdir}/vdpau/libvdpau_nvidia.so.%{version}
 %{nvidia_libdir}/libGL.so.1
 %{nvidia_libdir}/libGLdispatch.so.0
@@ -1172,10 +1166,10 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_modulesdir}/libnvidia-wfb.so.%{version}
 %endif
 
-#%%if !%%simple
-#%%{nvidia_extensionsdir}/libglx.so.%%{version}
-#%%{nvidia_extensionsdir}/libglx.so
-#%%endif
+%if !%simple
+%{nvidia_extensionsdir}/libglx.so.%%{version}
+%{nvidia_extensionsdir}/libglx.so
+%endif
 
 %if !%simple
 %{nvidia_driversdir}/nvidia_drv.so
@@ -1184,7 +1178,7 @@ rmmod nvidia > /dev/null 2>&1 || true
 %ifarch %{biarches}
 %files -n %{driverpkgname}-32bit
 %dir %{nvidia_libdir32}
-#%dir %{nvidia_libdir32}/tls
+%dir %{nvidia_libdir32}/tls
 %dir %{nvidia_libdir32}/vdpau
 %{nvidia_libdir32}/libGL.so.%{version}
 %{nvidia_libdir32}/libEGL_nvidia.so.0
@@ -1197,7 +1191,6 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so.%{version}
 %{nvidia_libdir32}/libvdpau_nvidia.so
 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version}
-%{nvidia_libdir32}/libnvidia-glvkspirv.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.%{version}
 %{nvidia_libdir32}/libnvidia-ml.so.1
 %{nvidia_libdir32}/libnvidia-ifr.so.%{version}
@@ -1215,16 +1208,16 @@ rmmod nvidia > /dev/null 2>&1 || true
 %{nvidia_libdir32}/libGLX_nvidia.so.0
 %{nvidia_libdir32}/libGLX_nvidia.so.%{version}
 %{nvidia_libdir32}/libOpenGL.so.0
-#%%{nvidia_libdir32}/tls/libnvidia-tls.so.%%{version}
+%{nvidia_libdir32}/tls/libnvidia-tls.so.%%{version}
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so
 %{nvidia_libdir32}/libnvidia-ptxjitcompiler.so.1
 %endif
 
-#%files -n %{drivername}-devel -f %pkgname/nvidia-devel.files
+#%%files -n %{drivername}-devel -f %pkgname/nvidia-devel.files
 %files -n %{drivername}-devel
 %defattr(-,root,root)
 %if !%simple
-#%{_includedir}/%{drivername}
+%{_includedir}/%{drivername}/GL
 %{nvidia_libdir}/libGL.so
 %{nvidia_libdir}/libEGL.so
 %{nvidia_libdir}/libGLESv*.so
