@@ -120,6 +120,7 @@ BuildRequires:	pkgconfig(libtirpc)
 BuildRequires:	pkgconfig(gl)
 BuildRequires:	pkgconfig(xxf86vm)
 BuildRequires:	pkgconfig(dbus-1)
+BuildRequires:  pkgconfig(xrandr)
 %endif
 BuildRequires:	rpm-build >= 1:5.3.12
 
