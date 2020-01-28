@@ -12,7 +12,7 @@
 %{?_without_simple: %global simple 0}
 %{?_with_simple: %global simple 1}
 
-%define name	nvidia-long-lived
+%define name	nvidia-390
 %define kname nvidia
 
 %if !%simple
