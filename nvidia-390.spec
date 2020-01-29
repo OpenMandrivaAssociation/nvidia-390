@@ -30,7 +30,7 @@
 
 # For now, backportability is kept for 2008.0 forwards.
 
-%define drivername nvidia-long-lived
+%define drivername nvidia-390
 %define driverpkgname x11-driver-video-%{drivername}
 %define modulename %{drivername}
 # for description and documentation
@@ -101,7 +101,7 @@ Source3:	https://download.nvidia.com/XFree86/nvidia-xconfig/nvidia-xconfig-%{ver
 Source4:	nvidia-mdvbuild-skel
 Source5:	https://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-%{version}.tar.bz2
 Source6:	https://download.nvidia.com/XFree86/nvidia-persistenced/nvidia-persistenced-%{version}.tar.bz2
-Source100:	nvidia-long-lived.rpmlintrc
+Source100:	nvidia-390.rpmlintrc
 # include xf86vmproto for X_XF86VidModeGetGammaRampSize, fixes build on cooker
 Patch3:		nvidia-settings-include-xf86vmproto.patch
 Patch8:		nvidia-persistenced-319.17-add-missing-libtirpc-link.patch
@@ -126,7 +126,7 @@ BuildRequires:	rpm-build >= 1:5.3.12
 
 %description
 Source package of the current NVIDIA proprietary driver. Binary
-packages are named x11-driver-video-nvidia-long-lived.
+packages are named x11-driver-video-nvidia-390.
 
 %package -n %{driverpkgname}
 Summary:	NVIDIA proprietary X.org driver and libraries for %cards
