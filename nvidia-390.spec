@@ -56,7 +56,7 @@
 %define ldetect_cards_name NVIDIA GeForce 7050
 %endif
 
-%define biarches x86_64
+%define biarches x86_64 znver1
 
 %if !%simple
 %ifarch %{ix86}
@@ -64,6 +64,10 @@
 %define pkgname %{pkgname32}
 %endif
 %ifarch x86_64
+%define nsource %{SOURCE1}
+%define pkgname %{pkgname64}
+%endif
+%ifarch znver1
 %define nsource %{SOURCE1}
 %define pkgname %{pkgname64}
 %endif
