@@ -18,7 +18,7 @@
 %if !%simple
 # When updating, please add new ids to ldetect-lst (merge2pcitable.pl)
 %define version 390.132
-%define rel 1
+%define rel 2
 # the highest supported videodrv abi
 %define videodrv_abi 23
 %endif
@@ -924,40 +924,6 @@ chmod 0755 %{buildroot}%{_sysconfdir}/%{drivername}/nvidia-settings.xinit
 install -d -m755 %{buildroot}%{_sysconfdir}/X11/xinit.d
 touch %{buildroot}%{_sysconfdir}/X11/xinit.d/nvidia-settings.xinit
 
-# install ldetect-lst pcitable files for backports
-# local version of merge2pcitable.pl:read_nvidia_readme:
-#section="nothingyet"
-#set +x
-#[ -e README.txt ] || cp -a usr/share/doc/README.txt .
-#cat README.txt | while read line; do
-#	if [ "$section" = "nothingyet" ] || [ "$section" = "midspace" ]; then
-#		if echo "$line" | grep -Pq "^\s*NVIDIA GPU product\s+Device PCI ID"; then
-#			section="data"
-#		elif [ "$section" = "midspace" ] && echo "$line" | grep -Pq "legacy"; then
-#			break
-#		fi
-#		continue
-#	fi
-#
-#	if [ "$section" = "data" ] && echo "$line" | grep -Pq "^\s*$"; then
-#		section="midspace"
-#		continue
-#	fi
-#
-#	echo "$line" | grep -Pq "^\s*-+[\s-]+$" && continue
-#	id=$(echo "$line" | sed -nre 's,^\s*.+?\s\s+(0x)?([0-9a-fA-F]{4}).*$,\2,p' | tr '[:upper:]' '[:lower:]')
-	#id2=$(echo "$line" | sed -nre 's,^\s*.+?\s\s+0x(....)\s0x(....).*$,\2,p' | tr '[:upper:]' '[:lower:]')
-#	subsysid=
-	# not useful as of 2013-05 -Anssi
-#	#[ -n "$id2" ] && subsysid="	0x10de	0x$id2"
-#	echo "0x10de	0x$id$subsysid	\"Card:%{ldetect_cards_name}\""
-#done | sort -u > pcitable.nvidia.lst
-#set -x
-#[ $(wc -l pcitable.nvidia.lst | cut -f1 -d" ") -gt 200 ]
-#%if "%{ldetect_cards_name}" != ""
-#install -d -m755 %{buildroot}%{_datadir}/ldetect-lst/pcitable.d
-#gzip -c pcitable.nvidia.lst > %{buildroot}%{_datadir}/ldetect-lst/pcitable.d/40%{drivername}.lst.gz
-#%endif
 
 export EXCLUDE_FROM_STRIP="$(find %{buildroot} -type f \! -name nvidia-settings \! -name nvidia-xconfig \! -name nvidia-modprobe \! -name nvidia-persistenced)"
 
@@ -994,6 +960,8 @@ mkdir -p %{_libdir}/vdpau
 	--slave %{_prefix}/lib/vdpau/libvdpau_nvidia.so.1 libvdpau_nvidia.so.1 %{nvidia_libdir32}/vdpau/libvdpau_nvidia.so.%{version} \
 %endif
 	--slave %{xorg_extra_modules} xorg_extra_modules %{nvidia_extensionsdir} \
+
+#Line below breaks module loading	
 #	--slave %{_sysconfdir}/modprobe.d/display-driver.conf display-driver.conf %{_sysconfdir}/%{drivername}/modprobe.conf \
 	
 if [ "${current_glconf}" = "%{_sysconfdir}/nvidia97xx/ld.so.conf" ]; then
