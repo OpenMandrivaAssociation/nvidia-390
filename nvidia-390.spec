@@ -1104,7 +1104,6 @@ sed -i 's/ rd.driver.blacklist=nouveau nvidia-drm.modeset=1//' /etc/default/grub
 %{nvidia_libdir}/libGL.so.%{version}
 %{nvidia_libdir}/libnvidia-eglcore.so.%{version}
 %{nvidia_libdir}/libnvidia-egl-wayland.so.*
-%{nvidia_libdir}/libnvidia-fatbinaryloader.so.%{version}
 %{nvidia_libdir}/libnvidia-glsi.so.%{version}
 %{nvidia_libdir}/libnvidia-gtk2.so.%{version}
 %{nvidia_libdir}/libnvidia-gtk3.so.%{version}
@@ -1260,6 +1259,7 @@ sed -i 's/ rd.driver.blacklist=nouveau nvidia-drm.modeset=1//' /etc/default/grub
 %{nvidia_libdir}/libnvidia-encode.so.1
 %{nvidia_libdir}/libnvcuvid.so.%{version}
 %{nvidia_libdir}/libnvcuvid.so.1
+%{nvidia_libdir}/libnvidia-fatbinaryloader.so.%{version}
 %ifarch %{biarches}
 %{nvidia_libdir32}/libOpenCL.so.1.0.0
 %{nvidia_libdir32}/libOpenCL.so.1.0
