@@ -1,4 +1,6 @@
 ## I love OpenSource :-(
+#%%define _disable_lto 1
+%global ldflags %{ldflags} -fuse-ld=bfd
 %define debug_package %{nil}
 
 ## NOTE: When modifying this .spec, you do not necessarily need to care about
@@ -308,7 +310,7 @@ DEST_MODULE_NAME[2]="nvidia-uvm"
 BUILT_MODULE_NAME[3]="nvidia-drm"
 DEST_MODULE_LOCATION[3]="/kernel/drivers/char/drm"
 DEST_MODULE_NAME[3]="nvidia-drm"
-MAKE[0]="'make' CC=gcc CXX=g++ SYSSRC=\${kernel_source_dir} modules"
+MAKE[0]="'make' CC=clang CXX=clang++ SYSSRC=\${kernel_source_dir} modules"
 AUTOINSTALL="yes"
 EOF
 
@@ -332,7 +334,7 @@ EOF
 rm nvidia-settings-%{version}/src/*/*.a ||:
 
 %build
-export CC=gcc  CXX=g++
+#export CC=gcc  CXX=g++
 export LD=ld.bfd 
 %setup_compile_flags
 
@@ -347,11 +349,11 @@ popd
 # (tpg) need to provide a patch to fix format error
 export CFLAGS="%{optflags} -Wno-error=format-security"
 
-%make -C nvidia-settings-%{version}/src/libXNVCtrl CC=gcc
-%make -C nvidia-settings-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false CC=gcc
-%make -C nvidia-xconfig-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
-%make -C nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
-%make -C nvidia-persistenced-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+%make_build -C nvidia-settings-%{version}/src/libXNVCtrl CC=clang
+%make_build -C nvidia-settings-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false CC=clang
+%make_build -C nvidia-xconfig-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+%make_build -C nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+%make_build -C nvidia-persistenced-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
 
 # %simple
 %endif
@@ -364,7 +366,7 @@ install -d -m755 %{buildroot}%{_usrsrc}/%{drivername}-%{version}-%{release}
 cat > nvllbuild << EOF
 #!/bin/sh
 set -e
-export "CC=gcc" LDFLAGS="$LDFLAGS --build-id=none"
+export "CC=clang" LDFLAGS="$LDFLAGS --build-id=none"
 ln -s Module.symvers nvidia-drm/Module.symvers 
 ln -s Module.symvers nvidia-modeset/Module.symvers 
 ln -s Module.symvers nvidia-uvm/Module.symvers 
