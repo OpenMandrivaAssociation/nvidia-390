@@ -77,8 +77,8 @@
 
 # Other packages should not require any NVIDIA libraries, and this package
 # should not be pulled in when libGL.so.1 is required
-%global __provides_exclude \\.so
-%define common_-requires_exceptions ^libGL\\.so\\|^libGLcore\\.so\\|^libGLdispatch\\.so|^libnvidia.*\\.so
+%global __provides_exclude libGLESv1_CM.so.1|libGLESv2.so.2|libGLdispatch.so.0|libOpenGL.so.0
+%define common__requires_exceptions ^libGL\\.so\\|^libGLcore\\.so\\|^libGLdispatch\\.so|^libnvidia.*\\.so
 
 %ifarch %{biarches}
 # (anssi) Allow installing of 64-bit package if the runtime dependencies
