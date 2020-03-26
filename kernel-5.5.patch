@@ -339,6 +339,48 @@
 - #include "nvkms-kapi.h"
 - 
 - struct NvKmsKapiConnectorInfo*
+diff --git a/kernel/common/inc/nv-drm.h b/kernel/common/inc/nv-drm.h
+new file mode 100644
+index 0000000..07e9f3c
+--- /dev/null
++++ b/kernel/common/inc/nv-drm.h
+@@ -0,0 +1,36 @@
++#ifndef _NV_DRM_H_
++#define _NV_DRM_H_
++
++#include "conftest.h"
++
++#if defined(NV_DRM_DRMP_H_PRESENT)
++#include <drm/drmP.h>
++#else
++#include <linux/agp_backend.h>
++#include <linux/file.h>
++#include <linux/init.h>
++#include <linux/jiffies.h>
++#include <linux/kernel.h>
++#include <linux/mutex.h>
++#include <linux/slab.h>
++#include <linux/types.h>
++#include <asm/pgalloc.h>
++#include <linux/uaccess.h>
++
++#include <uapi/drm/drm.h>
++#include <uapi/drm/drm_mode.h>
++
++#include <drm/drm_agpsupport.h>
++#include <drm/drm_crtc.h>
++#include <drm/drm_drv.h>
++#include <drm/drm_prime.h>
++#include <drm/drm_pci.h>
++#include <drm/drm_ioctl.h>
++#include <drm/drm_sysfs.h>
++#include <drm/drm_vblank.h>
++#include <drm/drm_device.h>
++
++#include <drm/drm_gem.h>
++#endif
++
++#endif
 diff --git a/kernel/conftest.sh b/kernel/conftest.sh
 index cc25806..6104639 100755
 --- a/kernel/conftest.sh
