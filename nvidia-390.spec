@@ -4,7 +4,7 @@
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
 Version:	390.132
-Release:	1
+Release:	2
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://us.download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
