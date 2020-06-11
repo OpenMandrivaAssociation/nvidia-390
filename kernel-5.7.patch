@@ -1,0 +1,103 @@
+diff --git a/NVIDIA-Linux-x86_64-390.132/kernel/conftest.sh b/NVIDIA-Linux-x86_64-390.132/kernel/conftest.sh
+index 6104639..9c98580 100755
+--- a/NVIDIA-Linux-x86_64-390.132/kernel/conftest.sh
++++ b/NVIDIA-Linux-x86_64-390.132/kernel/conftest.sh
+@@ -131,6 +131,7 @@ test_headers() {
+     # Arch specific headers which need testing
+     FILES_ARCH="asm/book3s/64/hash-64k.h"
+     FILES_ARCH="$FILES_ARCH asm/set_memory.h"
++    FILES_ARCH="$FILES_ARCH asm/pgtable.h"
+     FILES_ARCH="$FILES_ARCH asm/powernv.h"
+     FILES_ARCH="$FILES_ARCH asm/tlbflush.h"
+ 
+@@ -397,6 +398,8 @@ compile_test() {
+             # Determine if the set_memory_uc() function is present.
+             #
+             CODE="
++	    #include <asm/page.h>
++	    #include <asm/pgtable.h>
+             #if defined(NV_ASM_SET_MEMORY_H_PRESENT)
+             #include <asm/set_memory.h>
+             #else
+@@ -414,6 +417,8 @@ compile_test() {
+             # Determine if the set_memory_array_uc() function is present.
+             #
+             CODE="
++	    #include <asm/page.h>
++	    #include <asm/pgtable.h>
+             #if defined(NV_ASM_SET_MEMORY_H_PRESENT)
+             #include <asm/set_memory.h>
+             #else
+@@ -466,6 +471,8 @@ compile_test() {
+             # Determine if the set_pages_uc() function is present.
+             #
+             CODE="
++            #include <asm/page.h>
++            #include <asm/pgtable.h>
+             #if defined(NV_ASM_SET_MEMORY_H_PRESENT)
+             #include <asm/set_memory.h>
+             #else
+@@ -1189,6 +1196,22 @@ compile_test() {
+             compile_check_conftest "$CODE" "NV_IOREMAP_CACHE_PRESENT" "" "functions"
+         ;;
+ 
++        ioremap_nocache)
++            #
++            # Determine if the ioremap_nocache() function is present.
++            #
++            # Removed by commit 4bdc0d676a64 ("remove ioremap_nocache and
++            # devm_ioremap_nocache") in v5.6 (2020-01-06)
++            #
++            CODE="
++            #include <asm/io.h>
++            void conftest_ioremap_nocache(void) {
++                ioremap_nocache();
++            }"
++
++            compile_check_conftest "$CODE" "NV_IOREMAP_NOCACHE_PRESENT" "" "functions"
++        ;;
++
+         ioremap_wc)
+             #
+             # Determine if the ioremap_wc() function is present.
+@@ -1422,6 +1445,31 @@ compile_test() {
+             compile_check_conftest "$CODE" "NV_SG_ALLOC_TABLE_FROM_PAGES_PRESENT" "" "functions"
+         ;;
+ 
++        proc_ops)
++            CODE="
++            #include <linux/proc_fs.h>
++            int conftest_proc_ops(void) {
++                return offsetof(struct proc_ops, proc_open);
++            }"
++
++            compile_check_conftest "$CODE" "NV_HAVE_PROC_OPS" "" "types"
++        ;;
++
++        ktime_get_raw_ts64)
++            #
++            # Determine if the ktime_get_raw_ts64() function is present.
++            #
++            CODE="
++            #include <linux/ktime.h>
++            int conftest_ktime_get_raw_ts64(void) {
++                struct timespec64 ts = {0};
++
++                ktime_get_raw_ts64(&ts64);
++            }"
++
++            compile_check_conftest "$CODE" "NV_KTIME_GET_RAW_TS64_PRESENT" "" "functions"
++        ;;
++
+         efi_enabled)
+             #
+             # Determine if the efi_enabled symbol is present, or if
+@@ -1821,7 +1869,7 @@ compile_test() {
+             # Determine if atomic_long_t and associated functions are defined
+             # Added in 2.6.16 2006-01-06 d3cb487149bd706aa6aeb02042332a450978dc1c
+             CODE="
+-            #include <asm/atomic.h>
++            #include <linux/atomic.h>
+             void conftest_atomic_long(void) {
+                 atomic_long_t data;
+                 atomic_long_read(&data);

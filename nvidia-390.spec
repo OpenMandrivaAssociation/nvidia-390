@@ -11,6 +11,8 @@ Source0:	http://us.download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Li
 Source1:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/xorg-nvidia.conf	
 Source2:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/modprobe-nvidia.conf	
 Patch1:		kernel-5.5.patch
+Patch2:		kernel-5.6.patch
+Patch3:		kernel-5.7.patch
 Group:		Hardware
 License:	distributable
 # Just to be on the safe side, it may not be wise
@@ -125,6 +127,9 @@ sh %{S:0} --extract-only
 
 cd NVIDIA-Linux-x86_64-%{version}
 %patch1 -p1
+%patch2 -p1
+%patch3 -p2
+
 
 %build
 
