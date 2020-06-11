@@ -4,10 +4,10 @@
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
 Version:	390.132
-Release:	3
+Release:	4
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
-Source0:	http://us.download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
+Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
 Source1:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/xorg-nvidia.conf	
 Source2:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/modprobe-nvidia.conf	
 Patch1:		kernel-5.5.patch
