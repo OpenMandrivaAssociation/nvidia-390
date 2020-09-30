@@ -1,16 +1,18 @@
+%global debug_package %{nil}
+
 %bcond_with kernel_rc
 
 
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
-Version:	390.132
-Release:	8
+Version:	390.138
+Release:	4
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
 Source1:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/xorg-nvidia.conf	
 Source2:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/modprobe-nvidia.conf	
-Patch1:		kernel-5.5.patch
+Patch1:		kernel-5.8.patch
 Patch2:		kernel-5.6.patch
 Patch3:		kernel-5.7.patch
 Group:		Hardware
@@ -127,8 +129,8 @@ sh %{S:0} --extract-only
 
 cd NVIDIA-Linux-x86_64-%{version}
 %patch1 -p1
-%patch2 -p1
-%patch3 -p2
+#%%patch2 -p1
+#%%patch3 -p2
 
 
 %build
@@ -275,6 +277,8 @@ done
 instx %{_bindir}/nvidia-bug-report.sh
 instx %{_bindir}/nvidia-smi
 inst %{_mandir}/man1/nvidia-smi.1
+instx %{_bindir}/nvidia-settings
+inst %{_mandir}/man1/nvidia-settings.1
 
 # glvk
 #instx %{_libdir}/libnvidia-glvkspirv.so.%{version}
@@ -333,6 +337,9 @@ inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
 %{_bindir}/nvidia-bug-report.sh
 %{_bindir}/nvidia-smi
 %{_mandir}/man1/nvidia-smi.1*
+%{_bindir}/nvidia-settings
+%{_mandir}/man1/nvidia-settings.1*
+
 #%%{_libdir}/libnvidia-glvkspirv.so*
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-rc
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-key-documentation
