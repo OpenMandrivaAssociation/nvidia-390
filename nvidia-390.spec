@@ -270,8 +270,8 @@ done
 instx %{_bindir}/nvidia-bug-report.sh
 instx %{_bindir}/nvidia-smi
 inst %{_mandir}/man1/nvidia-smi.1
-instx %{_bindir}/nvidia-settings                                       ║║                                                                        ║
-║inst %{_mandir}/man1/nvidia-settings.1
+instx %{_bindir}/nvidia-settings
+inst %{_mandir}/man1/nvidia-settings.1
 
 # glvk
 #instx %{_libdir}/libnvidia-glvkspirv.so.%{version}
