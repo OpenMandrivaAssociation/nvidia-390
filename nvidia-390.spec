@@ -54,8 +54,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.5.12-1
-%define kdir 5.5.12-desktop-1omv4001
+%define kversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-release-desktop-devel |tail -n1)
+%define kdir %(rpm -q --qf '%%{VERSION}-desktop-%%{RELEASE}%%{DISTTAG}\\n' kernel-release-desktop-devel |tail -n1)
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
@@ -70,8 +70,8 @@ BuildRequires:	kernel-release-desktop-devel
 Kernel modules needed by the binary-only nvidia driver
 
 %package kernel-modules-server
-%define skversion 5.5.12-1
-%define skdir 5.5.12-server-1omv4001
+%define skversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-release-server-devel |tail -n1)
+%define skdir %(rpm -q --qf '%%{VERSION}-server-%%{RELEASE}%%{DISTTAG}\\n' kernel-release-server-devel |tail -n1)
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-server = %{skversion}
