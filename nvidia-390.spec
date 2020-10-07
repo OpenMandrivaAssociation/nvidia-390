@@ -4,7 +4,7 @@
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
 Version:	390.132
-Release:	5
+Release:	6
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://us.download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
@@ -54,8 +54,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.5.12-1
-%define kdir 5.5.12-desktop-1omv4001
+%define dkversion 5.5.12-1
+%define dkdir 5.5.12-desktop-1omv4001
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
