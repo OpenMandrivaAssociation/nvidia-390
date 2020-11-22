@@ -1,16 +1,19 @@
+%define debug_package %{nil}
 %bcond_with kernel_rc
 
 
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
-Version:	390.132
-Release:	6
+Version:	390.138
+Release:	1
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://us.download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
 Source1:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/xorg-nvidia.conf	
 Source2:	https://gitweb.frugalware.org/frugalware-current/raw/master/source/x11-extra/nvidia/modprobe-nvidia.conf	
-Patch1:		kernel-5.5.patch
+Source3:	https://download.nvidia.com/XFree86/nvidia-modprobe/nvidia-modprobe-%{version}.tar.bz2
+Patch1:		kernel-5.9.9.patch
+Patch2:		kernel-5.9.9-p2.patch
 Group:		Hardware
 License:	distributable
 # Just to be on the safe side, it may not be wise
@@ -54,8 +57,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.5.12-1
-%define kdir 5.5.12-desktop-1omv4001
+%define kversion 5.9.9-1
+%define kdir 5.9.9-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
@@ -70,8 +73,8 @@ BuildRequires:	kernel-release-desktop-devel
 Kernel modules needed by the binary-only nvidia driver
 
 %package kernel-modules-server
-%define skversion 5.5.12-1
-%define skdir 5.5.12-desktop-1omv4001
+%define skversion 5.9.9-1
+%define skdir 5.9.9-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-server = %{skversion}
@@ -120,11 +123,13 @@ Kernel modules needed by the binary-only nvidia driver
 %endif
 
 %prep
-%setup -T -c %{name}-%{version}
-sh %{S:0} --extract-only
+%setup -q -c -T -a 3
 
+sh %{S:0} --extract-only
 cd NVIDIA-Linux-x86_64-%{version}
+
 %patch1 -p1
+%patch2 -p1
 
 %build
 
@@ -151,6 +156,8 @@ cd ../kernel-rc-server
 make SYSSRC=%{_prefix}/src/linux-%{rskdir} CC=%{_bindir}/gcc IGNORE_CC_MISMATCH=1
 %endif
 
+%make -C ../../nvidia-modprobe-%{version} NV_KEEP_UNSTRIPPED_BINARIES=false
+
 %install
 cd NVIDIA-Linux-x86_64-%{version}
 
@@ -169,6 +176,8 @@ instx() {
 sl() {
 	if [ -n "$2" ]; then ln -s lib$1.so.%{version} %{buildroot}%{_libdir}/lib$1.so.$2; fi
 	if [ -z "$3" ]; then ln -s lib$1.so.%{version} %{buildroot}%{_libdir}/lib$1.so; fi
+
+
 %ifarch %{x86_64}
 	if [ -e %{buildroot}%{_prefix}/lib/lib$1.so.%{version} ]; then
 		if [ -n "$2" ]; then ln -s lib$1.so.%{version} %{buildroot}%{_prefix}/lib/lib$1.so.$2; fi
@@ -272,6 +281,7 @@ instx %{_bindir}/nvidia-smi
 inst %{_mandir}/man1/nvidia-smi.1
 instx %{_bindir}/nvidia-settings
 inst %{_mandir}/man1/nvidia-settings.1
+instx %{_bindir}/nvidia-modprobe
 
 # glvk
 #instx %{_libdir}/libnvidia-glvkspirv.so.%{version}
@@ -289,13 +299,13 @@ cd kernel
 inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-modeset.ko
-inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-uvm.ko
+#inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-uvm.ko
 
 cd ../kernel-server
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-modeset.ko
-inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
+#inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
 
 %files
 %{_libdir}/xorg/modules/drivers/nvidia_drv.so
@@ -337,6 +347,7 @@ inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
 %{_datadir}/nvidia/nvidia-application-profiles-%{version}-key-documentation
 %{_sysconfdir}/X11/xorg.conf.d/15-nvidia.conf
 %{_sysconfdir}/modprobe.d/nvidia.conf
+%{_bindir}/nvidia-modprobe
 
 %ifarch %{x86_64}
 %files 32bit
