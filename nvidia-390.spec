@@ -282,6 +282,7 @@ inst %{_mandir}/man1/nvidia-smi.1
 instx %{_bindir}/nvidia-settings
 inst %{_mandir}/man1/nvidia-settings.1
 instx %{_bindir}/nvidia-modprobe
+chmod 4755 %{bindir}/nvidia-modprobe
 
 # glvk
 #instx %{_libdir}/libnvidia-glvkspirv.so.%{version}
@@ -428,9 +429,15 @@ sed -i 's/GRUB_CMDLINE_LINUX_DEFAULT="/GRUB_CMDLINE_LINUX_DEFAULT="rd.driver.bla
 /usr/bin/dracut -f --kver %{rskdir}
 %{_sbindir}/update-grub2
 
+%post
+echo "The uvm module is not shipped with this rpm as it violates the kernel license. This package may be used 
+with blender which provides it's own drivers. 
+The suid binary nvidia-modprobe provided with this package may be used to load these." >/dev/stderr
+
 %postun kernel-modules-rc-server
 sed -i 's/rd.driver.blacklist=nouveau //g' %{_sysconfdir}/default/grub
 /sbin/depmod -a %{rskdir}
 /usr/bin/dracut -f --kver %{rskdir}
 %{_sbindir}/update-grub2
 %endif
+
