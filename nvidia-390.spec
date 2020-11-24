@@ -57,8 +57,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.9.9-1
-%define kdir 5.9.9-desktop-1omv4002
+%define kversion 5.9.10-1
+%define kdir 5.9.10-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
@@ -73,8 +73,8 @@ BuildRequires:	kernel-release-desktop-devel
 Kernel modules needed by the binary-only nvidia driver
 
 %package kernel-modules-server
-%define skversion 5.9.9-1
-%define skdir 5.9.9-desktop-1omv4002
+%define skversion 5.9.10-1
+%define skdir 5.9.10-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-server = %{skversion}
@@ -173,6 +173,14 @@ instx() {
 		install -m 755 -D "32/$(basename $1)" %{buildroot}$(echo $1 |sed -e 's,%_lib,lib,')
 	fi
 }
+instsx() {
+        install -m 4755 -D $(basename $1) %{buildroot}"$1"
+        if [ -e "32/$(basename $1)" ]; then
+                install -m 755 -D "32/$(basename $1)" %{buildroot}$(echo $1 |sed -e 's,%_lib,lib,')
+        fi
+}
+
+
 sl() {
 	if [ -n "$2" ]; then ln -s lib$1.so.%{version} %{buildroot}%{_libdir}/lib$1.so.$2; fi
 	if [ -z "$3" ]; then ln -s lib$1.so.%{version} %{buildroot}%{_libdir}/lib$1.so; fi
@@ -281,8 +289,6 @@ instx %{_bindir}/nvidia-smi
 inst %{_mandir}/man1/nvidia-smi.1
 instx %{_bindir}/nvidia-settings
 inst %{_mandir}/man1/nvidia-settings.1
-instx %{_bindir}/nvidia-modprobe
-chmod 4755 %{bindir}/nvidia-modprobe
 
 # glvk
 #instx %{_libdir}/libnvidia-glvkspirv.so.%{version}
@@ -307,6 +313,10 @@ inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-modeset.ko
 #inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
+
+cd ../../nvidia-modprobe-%{version}/_out/Linux_x86_64
+instsx %{_bindir}/nvidia-modprobe
+inst %{_mandir}/man1/nvidia-modprobe.1
 
 %files
 %{_libdir}/xorg/modules/drivers/nvidia_drv.so
@@ -349,6 +359,7 @@ inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-modeset.ko
 %{_sysconfdir}/X11/xorg.conf.d/15-nvidia.conf
 %{_sysconfdir}/modprobe.d/nvidia.conf
 %{_bindir}/nvidia-modprobe
+%{_mandir}/man1/nvidia-modprobe.1*
 
 %ifarch %{x86_64}
 %files 32bit
