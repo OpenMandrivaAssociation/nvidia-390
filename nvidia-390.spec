@@ -1,12 +1,12 @@
 %global debug_package %{nil}
 
 %bcond_with kernel_rc
-
+%bcond_with kernel_r_server
 
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
-Version:	390.138
-Release:	3
+Version:	390.141
+Release:	1
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
@@ -60,8 +60,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.10.3-2
-%define kdir 5.10.3-desktop-2omv4002
+%define kversion 5.10.6-1
+%define kdir 5.10.6-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
@@ -75,9 +75,11 @@ BuildRequires:	kernel-release-desktop-devel
 %description kernel-modules-desktop
 Kernel modules needed by the binary-only nvidia driver
 
+
+%if %{with kernel_r_server}
 %package kernel-modules-server
-%define skversion 5.10.3-2
-%define skdir 5.10.3-desktop-2omv4002
+%define skversion 5.10.6-1
+%define skdir 5.10.6-desktop-1omv4002
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-server = %{skversion}
@@ -90,6 +92,7 @@ BuildRequires:	kernel-release-server-devel
 
 %description kernel-modules-server
 Kernel modules needed by the binary-only nvidia driver
+%endif
 
 %if %{with kernel_rc}
 %package kernel-modules-rc-desktop
@@ -107,6 +110,7 @@ BuildRequires:	kernel-rc-desktop-devel
 
 %description kernel-modules-rc-desktop
 Kernel modules needed by the binary-only nvidia driver
+
 
 %package kernel-modules-rc-server
 %define rskversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-rc-server-devel |tail -n1)
@@ -131,17 +135,18 @@ Kernel modules needed by the binary-only nvidia driver
 sh %{S:0} --extract-only
 cd NVIDIA-Linux-x86_64-%{version}
 
-%patch0 -p1
-%patch1 -p1
-%patch2 -p1
-%patch3 -p1
+#%%patch0 -p1
+#%%patch1 -p1
+#%%patch2 -p1
+#%%patch3 -p1
 
 
 %build
 
 cd NVIDIA-Linux-x86_64-%{version}
-
+%if %{with kernel_r_server}
 cp -a kernel kernel-server
+%endif
 
 %if %{with kernel_rc}
 cp -a kernel kernel-rc
@@ -151,8 +156,10 @@ cp -a kernel kernel-rc-server
 cd kernel
 make SYSSRC=%{_prefix}/src/linux-%{kdir} CC=%{_bindir}/gcc
 
+%if %{with kernel_r_server}
 cd ../kernel-server
 make SYSSRC=%{_prefix}/src/linux-%{skdir} CC=%{_bindir}/gcc
+%endif
 
 %if %{with kernel_rc}
 cd ../kernel-rc
@@ -314,11 +321,13 @@ inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-modeset.ko
 #inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-uvm.ko
 
+%if %{with kernel_r_server}
 cd ../kernel-server
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-modeset.ko
 #inst /lib/modules/%{skdir}/kernel/drivers/video/nvidia-uvm.ko
+%endif
 
 cd ../../nvidia-modprobe-%{version}/_out/Linux_x86_64
 instsx %{_bindir}/nvidia-modprobe
@@ -407,6 +416,7 @@ sed -i 's/rd.driver.blacklist=nouveau //g' %{_sysconfdir}/default/grub
 /usr/bin/dracut -f --kver %{kdir}
 %{_sbindir}/update-grub2
 
+%if %{with kernel_r_server}
 %files kernel-modules-server
 /lib/modules/%{skdir}/kernel/drivers/video/*
 
@@ -421,6 +431,7 @@ sed -i 's/rd.driver.blacklist=nouveau //g' %{_sysconfdir}/default/grub
 /sbin/depmod -a %{skdir}
 /usr/bin/dracut -f --kver %{skdir}
 %{_sbindir}/update-grub2
+%endif
 
 %if %{with kernel_rc}
 %files kernel-modules-rc-desktop
