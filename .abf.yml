@@ -1,12 +1,3 @@
 sources:
   NVIDIA-Linux-x86_64-390.141.run: dcea2362078c90efa1d98e28bcd0ef180dc67499
   nvidia-modprobe-390.141.tar.bz2: 4adaf49a5db90334ceed53105a76cc6969532dd6
-
-removed_sources:
-  nvidia-modprobe-390.132.tar.bz2: 802727e5eeb6b09a7a053b1054ee0e9f203db0d2
-  nvidia-persistenced-390.132.tar.bz2: d9aeabc0ce05049e796eb82c57bb32f8bd378cae
-  nvidia-settings-390.132.tar.bz2: 0b782b517911bb3919cff74a93b51e001586b0ed
-  nvidia-xconfig-390.132.tar.bz2: e50cd28298fae541ab23f40eda5ea523d00e9769
-  NVIDIA-Linux-x86-390.132.run: 1966a1d54c3ab415a7b252f4a0d38fa77a7e4c30
-  nvidia-modprobe-390.138.tar.bz2: ca84a4ad5aa4557c4fed64e79f588328b94668a9
-  NVIDIA-Linux-x86_64-390.138.run: fd032bf15da1556bf13c1f55e8edc19f8558655d

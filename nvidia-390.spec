@@ -6,7 +6,7 @@
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
 Version:	390.141
-Release:	1
+Release:	2
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
@@ -60,8 +60,8 @@ This package should only be used as a last resort.
 %endif
 
 %package kernel-modules-desktop
-%define kversion 5.10.6-1
-%define kdir 5.10.6-desktop-1omv4002
+%define kversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-release-desktop-devel |tail -n1)
+%define kdir %(rpm -q --qf '%%{VERSION}-desktop-%%{RELEASE}%%{DISTTAG}\\n' kernel-release-desktop-devel |tail -n1)
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-desktop = %{kversion}
@@ -78,8 +78,8 @@ Kernel modules needed by the binary-only nvidia driver
 
 %if %{with kernel_r_server}
 %package kernel-modules-server
-%define skversion 5.10.6-1
-%define skdir 5.10.6-desktop-1omv4002
+%define skversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-release-server-devel |tail -n1)
+%define skdir %(rpm -q --qf '%%{VERSION}-desktop-%%{RELEASE}%%{DISTTAG}\\n' kernel-release-server-devel |tail -n1)
 Summary:	Kernel modules needed by the binary-only nvidia driver
 Provides:	%{name}-kernel-modules = %{EVRD}
 Requires:	kernel-release-server = %{skversion}
