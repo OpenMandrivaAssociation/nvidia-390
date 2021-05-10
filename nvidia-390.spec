@@ -5,8 +5,8 @@
 
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
-Version:	390.141
-Release:	4
+Version:	390.143
+Release:	1
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
@@ -23,7 +23,7 @@ License:	distributable
 # to load clang-built modules into a gcc-built kernel
 BuildRequires:	gcc
 Requires:	%{name}-kernel-modules = %{EVRD}
-Requires:	egl-wayland
+#Requires:	egl-wayland
 
 %description
 This is a binary-only driver for nvidia graphics chips.
