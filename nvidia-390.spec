@@ -1,11 +1,13 @@
 %global debug_package %{nil}
 
 %bcond_with kernel_rc
-%bcond_with kernel_r_server
+%bcond_without kernel_r_server
+%bcond_without kernel_clang
 
 Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
-Version:	390.141
+Version:	390.143
+
 Release:	2
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
@@ -75,6 +77,7 @@ BuildRequires:	kernel-release-desktop-devel
 %description kernel-modules-desktop
 Kernel modules needed by the binary-only nvidia driver
 
+%if %{with kernel_clang}
 %package kernel-modules-desktop-clang
 %define ckversion %(rpm -q --qf '%%{VERSION}-%%{RELEASE}\\n' kernel-release-desktop-clang-devel |tail -n1)
 %define ckdir %(rpm -q --qf '%%{VERSION}-desktop-clang-%%{RELEASE}%%{DISTTAG}\\n' kernel-release-desktop-clang-devel |tail -n1)
@@ -91,6 +94,7 @@ BuildRequires:  kernel-release-desktop-clang-devel
 
 %description kernel-modules-desktop-clang
 Kernel modules needed by the binary-only nvidia driver
+%endif
 
 %if %{with kernel_r_server}
 %package kernel-modules-server
@@ -192,10 +196,12 @@ cp -a kernel kernel-rc-server
 %endif
 
 cd kernel
-make SYSSRC=%{_prefix}/src/linux-%{kdir} CC=%{_bindir}/gcc
+make SYSSRC=%{_prefix}/src/linux-%{kdir} CC=%{_bindir}/gcc LD=ld.bfd
 
+%if %{with kernel_clang}
 cd ../kernel-clang
 make SYSSRC=%{_prefix}/src/linux-%{ckdir} CC=%{_bindir}/clang IGNORE_CC_MISMATCH=1
+%endif
 
 %if %{with kernel_r_server}
 cd ../kernel-server
@@ -263,8 +269,13 @@ inst %{_datadir}/glvnd/egl_vendor.d/10_nvidia.json
 # GLX extension module for X
 #instx %{_libdir}/xorg/modules/nvidia/extensions/libglxserver_nvidia.so.%{version}
 #ln -s libglxserver_nvidia.so.%{version} %{buildroot}%{_libdir}/xorg/modules/nvidia/extensions/libglxserver_nvidia.so
+mkdir -p %{buildroot}%{_libdir}/xorg/modules/nvidia/extensions
 instx %{_libdir}/libGLX_nvidia.so.%{version}
 sl GLX_nvidia 0 n
+instx %{_libdir}/xorg/modules/nvidia/extensions/libglx.so.%{version}
+pushd  %{buildroot}%{_libdir}/xorg/modules/nvidia/extensions/
+ln -s libglx.so.%{version} libglx.so
+popd
 
 # EGL
 instx %{_libdir}/libEGL_nvidia.so.%{version}
@@ -365,11 +376,13 @@ inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-modeset.ko
 #inst /lib/modules/%{kdir}/kernel/drivers/video/nvidia-uvm.ko
 
+%if %{with kernel_clang}
 cd ../kernel-clang
 inst /lib/modules/%{ckdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{ckdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{ckdir}/kernel/drivers/video/nvidia-modeset.ko
-inst /lib/modules/%{ckdir}/kernel/drivers/video/nvidia-uvm.ko
+#inst /lib/modules/%{ckdir}/kernel/drivers/video/nvidia-uvm.ko
+%endif
 
 %if %{with kernel_r_server}
 cd ../kernel-server
@@ -382,7 +395,7 @@ cd ../kernel-server-clang
 inst /lib/modules/%{cskdir}/kernel/drivers/video/nvidia.ko
 inst /lib/modules/%{cskdir}/kernel/drivers/video/nvidia-drm.ko
 inst /lib/modules/%{cskdir}/kernel/drivers/video/nvidia-modeset.ko
-inst /lib/modules/%{cskdir}/kernel/drivers/video/nvidia-uvm.ko
+#inst /lib/modules/%{cskdir}/kernel/drivers/video/nvidia-uvm.ko
 %endif
 
 cd ../../nvidia-modprobe-%{version}/_out/Linux_x86_64
@@ -394,8 +407,9 @@ inst %{_mandir}/man1/nvidia-modprobe.1
 %{_datadir}/vulkan/icd.d/nvidia_icd.json.template
 %{_libdir}/libnvidia-glcore.so*
 %{_datadir}/glvnd/egl_vendor.d/10_nvidia.json
-#*%{_libdir}/xorg/modules/nvidia/extensions/libglxserver_nvidia.so*
+#%%{_libdir}/xorg/modules/nvidia/extensions/libglxserver_nvidia.so*
 %{_libdir}/libGLX_nvidia.so*
+%{_libdir}/xorg/modules/nvidia/extensions/libglx.so*
 %{_libdir}/libEGL_nvidia.so*
 %{_libdir}/libnvidia-eglcore.so*
 %{_libdir}/libGLESv1_CM_nvidia.so*
@@ -472,6 +486,7 @@ sed -i 's/rd.driver.blacklist=nouveau //g' %{_sysconfdir}/default/grub
 /usr/bin/dracut -f --kver %{kdir}
 %{_sbindir}/update-grub2
 
+%if %{with kernel_clang}
 %files kernel-modules-desktop-clang
 /lib/modules/%{ckdir}/kernel/drivers/video/*
 
@@ -486,6 +501,7 @@ sed -i 's/rd.driver.blacklist=nouveau //g' %{_sysconfdir}/default/grub
 /sbin/depmod -a %{ckdir}
 /usr/bin/dracut -f --kver %{ckdir}
 %{_sbindir}/update-grub2
+%endif
 
 %if %{with kernel_r_server}
 %files kernel-modules-server
