@@ -8,7 +8,7 @@ Summary:	Binary-only driver for nvidia graphics chips
 Name:		nvidia-390
 Version:	390.143
 
-Release:	4
+Release:	5
 ExclusiveArch:	%{x86_64}
 Url:		http://www.nvidia.com/object/unix.html
 Source0:	http://download.nvidia.com/XFree86/Linux-x86_64/%{version}/NVIDIA-Linux-x86_64-%{version}.run
@@ -19,6 +19,9 @@ Patch0:         kernel-4.16.patch
 Patch1:		kernel-5.9.9.patch
 Patch2:		kernel-5.9.9-p2.patch
 Patch3:		kernel-5.10.patch
+Patch4:         kernel-5.12.patch
+Patch5:         kernel-5.13.patch
+
 Group:		Hardware
 License:	distributable
 # Just to be on the safe side, it may not be wise
@@ -176,6 +179,8 @@ cd NVIDIA-Linux-x86_64-%{version}
 #%%patch1 -p1
 #%%patch2 -p1
 #%%patch3 -p1
+%patch4 -p1
+%patch5 -p1
 
 
 %build
