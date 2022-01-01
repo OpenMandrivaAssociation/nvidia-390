@@ -183,8 +183,8 @@ cd NVIDIA-Linux-x86_64-%{version}
 #%%patch3 -p1
 %patch4 -p1
 #patch5 -p1
-%patch6 -p1
-%patch7 -p1
+#patch6 -p1
+#patch7 -p1
 
 
 %build
