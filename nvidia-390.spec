@@ -21,8 +21,8 @@ Patch2:		kernel-5.9.9-p2.patch
 Patch3:		kernel-5.10.patch
 Patch4:         kernel-5.12.patch
 #Patch5:         kernel-5.13.patch
-Patch6:		NVIDIA-Linux-x86_64-390.144-kernel-5.14-pdev.patch
-Patch7:		NVIDIA-Linux-x86_64-390.144-kernel-5.14-state.patch
+#Patch6:		NVIDIA-Linux-x86_64-390.144-kernel-5.14-pdev.patch
+#Patch7:		NVIDIA-Linux-x86_64-390.144-kernel-5.14-state.patch
 
 Group:		Hardware
 License:	distributable
